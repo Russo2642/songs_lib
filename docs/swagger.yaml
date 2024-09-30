@@ -1,0 +1,263 @@
+basePath: /api
+definitions:
+  domain.SongDetail:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      release_date:
+        type: string
+      song_id:
+        type: integer
+      text:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.SongDetailUpdateInput:
+    properties:
+      link:
+        type: string
+      release_date:
+        type: string
+      text:
+        type: string
+    type: object
+  domain.Songs:
+    properties:
+      created_at:
+        type: string
+      group:
+        type: string
+      id:
+        type: integer
+      song:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - group
+    - song
+    type: object
+  domain.SongsUpdateInput:
+    properties:
+      group:
+        type: string
+      song:
+        type: string
+    type: object
+  domain.SongsWithDetails:
+    properties:
+      detail:
+        $ref: '#/definitions/domain.SongDetail'
+      song:
+        $ref: '#/definitions/domain.Songs'
+    type: object
+  http.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  http.statusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  title: Online Song's Library
+  version: "1.0"
+paths:
+  /song_details/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update song detail by ID
+      parameters:
+      - description: Song Detail ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update song detail input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SongDetailUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/http.statusResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Update song detail
+      tags:
+      - songDetail
+  /songs:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of songs with optional filters
+      parameters:
+      - description: Group filter
+        in: query
+        name: group
+        type: string
+      - description: Song filter
+        in: query
+        name: song
+        type: string
+      - description: Text filter
+        in: query
+        name: text
+        type: string
+      - description: Release date filter
+        in: query
+        name: release_date
+        type: string
+      - description: Link filter
+        in: query
+        name: link
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit number
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of songs
+          schema:
+            items:
+              $ref: '#/definitions/domain.SongsWithDetails'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Get all songs
+      tags:
+      - songs
+    post:
+      consumes:
+      - application/json
+      description: Create a new song record by sending an API request with group and
+        song data to retrieve song details
+      parameters:
+      - description: Song data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Songs'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created song
+          schema:
+            $ref: '#/definitions/http.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Create a new song
+      tags:
+      - songs
+  /songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a song by ID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted song
+          schema:
+            $ref: '#/definitions/http.statusResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Delete a song
+      tags:
+      - songs
+    put:
+      consumes:
+      - application/json
+      description: Update a song by ID with the given input data
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated song data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SongsUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated song
+          schema:
+            $ref: '#/definitions/http.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Update an existing song
+      tags:
+      - songs
+swagger: "2.0"
